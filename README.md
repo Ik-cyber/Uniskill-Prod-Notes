@@ -1,210 +1,95 @@
-# 🚀 UniSkill+ Hackathon Deep Technical Plan
+# 🎓 **UniSkill+**
 
-> ✅ Full step-by-step breakdown: what to build, in what order, and how — for backend, frontend, mobile & AI.
-
----
-
-## ✅ 0. Initial planning
-
-- Define MVP: lecturer uploads → AI generates quiz → student views & completes quiz → badge issued → AI recommends next skill.
-- Tech stack:
-  - Backend: Node.js + Express / NestJS
-  - Frontend: Next.js
-  - Mobile: React Native
-  - AI: OpenAI API
-  - Blockchain: Solidity + Polygon testnet (Mumbai)
-  - DB: PostgreSQL
-
-### Project structure
-
-```
-/backend
-/frontend
-/mobile
-/docs
-```
+> AI-powered, blockchain-backed platform helping universities track, recommend, and certify **real-world, future-ready skills** — beyond GPA.
 
 ---
 
-## 🧰 1. Backend tasks (Backend Dev)
+## ✨ **Project Vision**
 
-### 📦 Setup
+Traditional transcripts focus on grades but fail to capture the practical growth and skills students gain.  
+**UniSkill+** changes this by integrating:
 
-```bash
-npx create-nest-app backend
-npm install axios openai pg typeorm cors dotenv
-```
-
-`.env`:
-
-```
-OPENAI_API_KEY=...
-DB_URL=...
-POLYGON_RPC_URL=...
-```
-
-### 📊 DB Models (TypeORM / Prisma)
-
-| Table   | Fields                                             |
-| ------- | -------------------------------------------------- |
-| Users   | id, name, email, role (lecturer/student)           |
-| Courses | id, title, description, video_url, lecturer_id     |
-| Quizzes | id, course_id, question, options[], correct_answer |
-| Badges  | id, student_id, course_id, tx_hash                 |
-
-### 🔧 API Endpoints
-
-| Method | Endpoint                         | Purpose                                    |
-| ------ | -------------------------------- | ------------------------------------------ |
-| POST   | /api/upload-course               | Lecturer uploads video & metadata          |
-| POST   | /api/generate-quiz               | Call OpenAI to create quiz from transcript |
-| GET    | /api/student/courses             | List available courses                     |
-| GET    | /api/student/:id/quiz            | Get quiz questions                         |
-| POST   | /api/student/:id/submit-quiz     | Check answers & issue badge                |
-| GET    | /api/student/:id/badges          | Show earned badges                         |
-| GET    | /api/student/:id/recommendations | AI skill recommendations                   |
-
-### 🧠 AI integration
-
-- Service file: `/backend/src/services/aiService.ts`
-- Use OpenAI SDK:
-
-```javascript
-const openai = new OpenAI(process.env.OPENAI_API_KEY);
-const completion = await openai.chat.completions.create({ ... });
-```
-
-- Store quiz & notes in DB.
-
-### 🔗 Blockchain badge issuing
-
-- Solidity smart contract:
-
-```solidity
-contract BadgeIssuer {
-    mapping(address => string[]) public badges;
-    function issueBadge(address student, string memory badgeId) public { ... }
-}
-```
-
-- Deploy on Polygon Mumbai using Hardhat.
-- Backend calls:
-
-```javascript
-const tx = await contract.issueBadge(studentAddress, badgeId);
-```
+- AI tools to help lecturers build engaging materials faster
+- Official departmental course structures, so students register and access the right courses
+- Personalized AI recommendations to help students advance in their field
+- Blockchain-backed certificates & badges to make these skills verifiable anywhere
+- A social space where students with similar interests can chat, collaborate, and network
 
 ---
 
-## 🖥 2. Frontend tasks (Frontend Dev)
+## 🏫 **Detailed Use Case & Flow**
 
-### ⚙️ Setup
+### 👩‍🏫 **Lecturers / Instructors**
 
-```bash
-npx create-next-app frontend
-npm install axios ethers tailwindcss
-```
-
-### 📂 Pages & components
-
-```
-/pages
-  /lecturer/upload.tsx
-  /student/dashboard.tsx
-  /student/quiz.tsx
-/components
-  Navbar, CourseCard, BadgeCard, QuizForm
-```
-
-### 🔧 Features
-
-- **Upload page:**
-  - Form: title, description, upload
-  - Calls `/api/upload-course` and `/api/generate-quiz`
-- **Student dashboard:**
-  - Fetch & show notes, quiz, badges, AI recommendations
-- **Quiz page:**
-  - Show quiz, submit answers, get badge link
-
-### 🧪 Blockchain
-
-```javascript
-import { ethers } from "ethers";
-const provider = new ethers.JsonRpcProvider(POLYGON_RPC_URL);
-```
+- Register and verify their identity as a lecturer in a specific department
+- Register the courses they teach (e.g., CSC101, MTH201)
+- Upload content in a structured way:
+  - **Video(s)** (hosted or linked)
+  - **Lecture notes / slides / PDFs**
+  - **External resources** (links to articles, tutorials, open resources)
+- Use AI tools to:
+  - Auto-generate summaries and study notes
+  - Create multiple-choice quizzes
+- Issue blockchain-backed certificates or badges to students who complete and pass assessments
 
 ---
 
-## 📱 3. Mobile tasks (Mobile Dev)
+### 🎓 **Students**
 
-### ⚙️ Setup
-
-```bash
-npx create-expo-app mobile
-npm install axios ethers react-navigation
-```
-
-### 📂 Screens
-
-- **DashboardScreen**: recommendations & badges
-- **QuizScreen**: display quiz & submit
-- **BadgeScreen**: show badge & tx link
-
----
-
-## 🎨 4. UI/UX designer tasks
-
-- Design wireframes: upload page, dashboard, quiz, badge
-- Pick colors, fonts, export icons
-- Share assets with frontend & mobile devs
+- Register with their email and official university identification (e.g., registration number)
+- Select their **department** (e.g., Computer Science, Business Administration)
+- See the **official list of required courses** for their department, together with the lecturers teaching them
+- Access:
+  - Video lectures
+  - AI-generated notes and summaries
+  - Curated external links and materials
+- Complete quizzes and get blockchain-verified badges
+- Over time:
+  - Receive AI-powered recommendations for advanced courses or related skill tracks (e.g., data analytics, digital marketing, AI basics)
+  - Build a living portfolio of verified skills and certificates
 
 ---
 
-## 🔗 5. Integration & flow
+### 🤝 **Community & Collaboration**
 
-1. Lecturer uploads course → backend saves
-2. Backend triggers AI → stores quiz & notes
-3. Student dashboard fetches & shows data
-4. Student submits quiz → backend issues badge
-5. Student sees badge (block explorer link)
-6. AI recommends next skill
-
----
-
-## 📜 6. AI Prompts
-
-- **Notes:** "Summarize this transcript into bullet notes for students."
-- **Quiz:** "Generate 5 MCQs from this text with answers & wrong options."
-- **Recommendation:** "Student completed digital skills course. Suggest 3 future-ready skills."
+- Built-in chat or forum area where students with similar interests (same department, same skill track, or same hackathon team) can:
+  - Share resources
+  - Ask questions
+  - Form study or project groups
+- Optional alumni and mentorship network to link current students with graduates
 
 ---
 
-## 🧪 7. Testing & demo prep
+## 🧠 **Future-Ready Skills & Personal Growth**
 
-- Seed DB with 1–2 sample courses
-- Test full flow
-- Make slides & short pitch script
-
----
-
-## ✅ 8. Deliverables
-
-- MVP live demo (Polygon testnet)
-- Code on GitHub
-- PDF pitch
-- (Optional) demo video
+- Students don’t just see what’s required — AI actively helps them discover:
+  - New technologies
+  - Industry-relevant electives
+  - Skill gaps to fill for their chosen career path
+- Badges and certificates for:
+  - Official courses
+  - Hackathons
+  - Volunteering and club activities
 
 ---
 
-## 🧩 Why this order?
+## ⚙️ **Technical Deep Dive**
 
-- Backend & AI first → unblock frontend & mobile
-- UI/UX design feeds early dev
-- Blockchain connects once flow tested
-- Mobile dev can reuse backend APIs
+- **Backend:** Node.js + Express / NestJS
+- **Frontend:** Next.js
+- **Mobile:** React Native / Expo
+- **AI:** Hugging Face (free tier) to generate quizzes, notes, and skill recommendations
+- **Blockchain:** Polygon testnet for free blockchain-based certificates
+- **DB:** MongoDB
+- **Storage:** Supabase Storage for videos, PDFs, and media files
+- **Real-time chat / community:** Could use Socket.io or third-party service like Supabase Realtime
 
 ---
 
-✨ **Done!**
+## ✅ **Key Highlights**
 
-Use this as your dev plan, README, or team doc 🚀
+- Combines verified academic content **and** real-world skills
+- Supports official departmental course structures — students always see the right courses first
+- AI saves lecturers’ time and personalizes the student experience
+- Blockchain-backed badges add trust and portability
+- Builds a student community inside and across departments
